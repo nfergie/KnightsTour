@@ -21,7 +21,25 @@ public class KnightsTour {
 
     static boolean solveNoHeurHelper(int x, int y, int moveNum, int [][] board,
                                      int[] xMove, int[] yMove){
-
+        int size = board.length;
+        int nextX, nextY;
+        if(moveNum == size*size){
+            return true;
+        }
+        for(int i =0; i < 8; i++){
+            nextX = x + xMove[i];
+            nextY = y + yMove[i];
+            if(safeMove(nextX, nextY, board)){
+                board[nextY][nextX] = moveNum;
+                if(solveNoHeurHelper(nextX, nextY, moveNum+1, board,
+                        xMove, yMove)){
+                    return true;
+                }else{
+                    board[nextY][nextX] = -1;
+                }
+            }
+        }
+        return false;
     }
 
     static boolean solveNoHeur(int[][] board, int startX, int startY){
@@ -47,7 +65,7 @@ public class KnightsTour {
         int startX = -1;
         int startY = -1;
         if(args.length < 1){
-            System.out.println("Program requires board size");
+            System.out.println("Program requires board size and start position");
             return;
         }else if(args.length == 4){
             heuris = true;
@@ -55,9 +73,9 @@ public class KnightsTour {
             startX = Integer.parseInt(args[2]);
             startY = Integer.parseInt(args[3]);
         } else if(args.length == 3){
-            boardSize = Integer.parseInt(args[1]);
-            startX = Integer.parseInt(args[2]);
-            startY = Integer.parseInt(args[3]);
+            boardSize = Integer.parseInt(args[0]);
+            startX = Integer.parseInt(args[1]);
+            startY = Integer.parseInt(args[2]);
         }else{
             System.out.println("Correct usage is [-h] boardSize startLocX startLocY");
             return;
@@ -73,7 +91,10 @@ public class KnightsTour {
         if(heuris){
             solveHeur(board);
         }else{
+            long startTime = System.nanoTime();
             solveNoHeur(board, startX, startY);
+            long endTime = System.nanoTime();
+            System.out.println("Time to process(ms): " + (endTime-startTime)/1000000 );
         }
 
     }
