@@ -2,6 +2,9 @@ import java.util.Arrays;
 
 public class KnightsTour {
 
+    static int [] yMove = {2, 1, -1, -2, -2, -1, 1, 2};
+    static int [] xMove = {1, 2, 2, 1, -1, -2, -2, -1};
+
     static boolean safeMove(int x, int y, int[][] board){
         int xsize = board.length;
         int ysize = board.length;
@@ -43,8 +46,6 @@ public class KnightsTour {
     }
 
     static boolean solveNoHeur(int[][] board, int startX, int startY){
-        int yMove[] = {2, 1, -1, -2, -2, -1, 1, 2};
-        int xMove[] = {1, 2, 2, 1, -1, -2, -2, -1};
 
         if(!solveNoHeurHelper(startX, startY, 1, board, xMove, yMove)){
             System.out.println("No Solution");
@@ -53,6 +54,18 @@ public class KnightsTour {
             printBoard(board);
         }
         return true;
+    }
+
+    static int getDegree(int[][] board, int x, int y){
+        int count = 0;
+        for(int i=0; i< 8; i++){
+            int nextX = x + xMove[i];
+            int nextY = y + yMove[i];
+            if(safeMove(nextX, nextY, board)){
+                count++;
+            }
+        }
+        return count;
     }
 
     static boolean solveHeur(int[][] board){
