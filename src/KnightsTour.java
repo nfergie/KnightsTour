@@ -2,8 +2,8 @@ import java.util.Arrays;
 
 public class KnightsTour {
 
-    static int [] yMove = {2, 1, -1, -2, -2, -1, 1, 2};
-    static int [] xMove = {1, 2, 2, 1, -1, -2, -2, -1};
+    static int [] yMove = {2,-2,1,-1,2,-2,1,-1};
+    static int [] xMove = {1,1,2,2,-1,-1,-2,-2};
 
     static boolean safeMove(int x, int y, int[][] board){
         int xsize = board.length;
@@ -48,6 +48,7 @@ public class KnightsTour {
     static boolean solveNoHeur(int[][] board, int startX, int startY){
 
         if(!solveNoHeurHelper(startX, startY, 1, board, xMove, yMove)){
+            printBoard(board);
             System.out.println("No Solution");
             return false;
         }else{
@@ -68,8 +69,40 @@ public class KnightsTour {
         return count;
     }
 
-    static boolean solveHeur(int[][] board){
-        return true;
+    static int [] nextMove(int[][] board, int startX, int startY){
+        int [] nextLoc = new int [2];
+        Arrays.fill(nextLoc, -1);
+        int currDeg = 9;
+        for(int i =0; i < 8; i++){
+            int nextX = startX + xMove[i];
+            int nextY = startY + yMove[i];
+            int c = getDegree(board, nextX, nextY);
+            if(safeMove(nextX, nextY, board) &&
+                   c  < currDeg){
+                nextLoc[0] = nextX;
+                nextLoc[1] = nextY;
+                currDeg = c;
+            }
+        }
+        return nextLoc;
+    }
+
+    static boolean solveHeur(int[][] board, int startX, int startY){
+        int [] next = nextMove(board, startX, startY);
+        int count = 1;
+        while(next[0] != -1){
+            board[next[1]][next[0]] = count;
+            next = nextMove(board, next[0], next[1]);
+            count++;
+        }
+        if(count < board.length*board.length){
+            printBoard(board);
+            System.out.println("No Solution");
+            return false;
+        }else{
+            printBoard(board);
+            return true;
+        }
     }
 
     public static void main(String[] args){
@@ -102,7 +135,10 @@ public class KnightsTour {
         board[startY][startX] = 0;
 
         if(heuris){
-            solveHeur(board);
+            long startTime = System.nanoTime();
+            solveHeur(board, startX, startY);
+            long endTime = System.nanoTime();
+            System.out.println("Time to process(ms): " + (endTime-startTime)/1000000);
         }else{
             long startTime = System.nanoTime();
             solveNoHeur(board, startX, startY);
